@@ -108,4 +108,10 @@ class StalkerTest < Test::Unit::TestCase
     assert_equal({'foo' => 123}, $job_args)
   end
 
+  test "work_one_job with a timeout" do
+    with_an_error_handler
+    Stalker.work_one_job(1)
+    assert $handled, "should have raised a timeout exception: #{$handled}"
+    assert_equal Beanstalk::TimedOut, $handled
+  end
 end

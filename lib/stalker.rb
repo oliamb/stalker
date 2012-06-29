@@ -66,8 +66,8 @@ module Stalker
 
   class JobTimeout < RuntimeError; end
 
-  def work_one_job
-    job = beanstalk.reserve
+  def work_one_job(timeout = 0)
+    job = (timeout > 0 ? beanstalk.reserve(timeout) : beanstalk.reserve())
     name, args = JSON.parse job.body
     log_job_begin(name, args)
     handler = @@handlers[name]
