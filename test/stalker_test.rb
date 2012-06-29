@@ -107,6 +107,19 @@ class StalkerTest < Test::Unit::TestCase
     assert_equal 'my.job', $job_name
     assert_equal({'foo' => 123}, $job_args)
   end
+  
+  test "parse BEANSTALK_URL" do
+    ENV['BEANSTALK_URL'] = "beanstalk://localhost:12300"
+    assert_equal Stalker.beanstalk_addresses, ["localhost:12300"]
+    ENV['BEANSTALK_URL'] = "beanstalk://localhost:12300/, beanstalk://localhost:12301/"
+    assert_equal Stalker.beanstalk_addresses, ["localhost:12300","localhost:12301"]
+    ENV['BEANSTALK_URL'] = "beanstalk://localhost:12300   beanstalk://localhost:12301"
+    assert_equal Stalker.beanstalk_addresses, ["localhost:12300","localhost:12301"]
+    ENV['BEANSTALK_URL'] = "beanstalk://localhost:12300, http://localhost:12301"
+    assert_raise Stalker::BadURL do
+      Stalker.beanstalk_addresses 
+    end
+  end
 
   test "work_one_job with a timeout" do
     with_an_error_handler
